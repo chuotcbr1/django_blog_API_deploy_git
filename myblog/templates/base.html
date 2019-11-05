@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'head.html'%}
+
+    {% block head_extra%}
+    {% endblock %}
+
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/esm/popper.min.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>-->
+</head>
+<body>
+<!--FB comments-->
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous"
+        src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v5.0&appId=674866806301438&autoLogAppEvents=1"></script>
+<!--end FB comments-->
+<!--Narbars-->
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <!-- Brand/logo -->
+    <!--  <a class="navbar-brand" href="#">-->
+    <!--    <img src="bird.jpg" alt="logo" style="width:40px;">-->
+    <!--  </a>-->
+
+    <!-- Links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'posts:post_list' %}">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'posts:post_create' %}">Create New Post</a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" action="" method="GET" enctype="multipart/form-data">
+                <input class="form-control mr-sm-2" name="q" type="text" placeholder="Search" value="{{request.GET.q}}">
+                <button class="btn btn-light" type="submit">Search</button>
+            </form>
+        </li>
+    </ul>
+</nav>
+<!-- end navbars-->
+{% block content %}
+
+{% endblock %}
+
+<!--script-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.7.0/marked.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function (){
+    $(".content-markdown").each(function(){
+        var content = $(this).text()
+        var markedContent = marked(content)
+        $(this).html(markedContent)
+    })
+    $(".content-markdown img").each(function(){
+        $(this).addClass("img-fluid")
+    })
+
+    $(".comment-reply-btn").click(function(event){
+        event.preventDefault();
+        $(this).parent().next(".comment-reply").fadeToggle();
+    })
+})
+</script>
+
+</body>
+</html>

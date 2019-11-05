@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+<div class="container col-sm-6 ">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li
+                {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <h1>Posts detail</h1>
+    <div class=" border">
+
+        <h2>{{object.title}}
+            {% if object.draft %}
+            <h5>Staff only: <span style="color:red;">Draft</span></h5>
+            {%if object.publish > today %}
+            <h5>Publish:<span style="color:red;">{{object.publish}}</span></h5>
+            {% endif %}
+            {% else %}
+            <small>{{object.publish}}</small>
+
+            {% endif %}
+        </h2>
+        <a href="{{object.get_update_url}}"> Update Post </a> |
+        <a href="{% url 'posts:post_delete' slug=object.slug %}"> Delete Post </a>
+        {% if object.image %}
+        <img src="{{object.image.url}}" alt="" class="img-fluid">
+        {% endif %}
+        <p><b>Author: {{object.user.username}}</b></p>
+        <!--        <p>{{object.content|linebreaks|truncatechars:120}}</p>-->
+        <p>Last update: {{object.updated}}</p>
+
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+<!--            <div class="content-markdown">-->
+<!--                {{object.content}}-->
+<!--            </div>-->
+            {{object.content}}
+            <!--            comments-->
+            <div class="container comment-form">
+                <h3>Comment: </h3>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {{comment_form|crispy}}
+                    <input type="submit" class="btn btn-info" value="Post Comment">
+                </form>
+            </div>
+            <div class="comments">
+                <h3>Commets:</h3>
+                <!--                {{object.comments}}-->
+                <div class="container">
+                    {% for comment in comments%}
+                    <!--   show comment -->
+                    <blockquote class="blockquote ">
+                        <p>{{comment.content}}</p>
+                        <footer class="blockquote-footer">via <b>{{comment.user.username}}</b>|
+                            {{comment.timestamp|timesince}} ago
+                            | {% if comment.children.count >= 0 %} {{comment.children.count}} Comment{% if comment.children.count > 1 %}s{% endif %} {% endif %}
+                            | <a href="#" class="comment-reply-btn">Reply</a>
+
+                        </footer>
+                        <!--  show  reply list  -->
+                        <div class="comment-reply" >
+                            {% for children_comment in comment.children %}
+                            <blockquote class="blockquote border-left pl-sm-5">
+                                <p>{{children_comment.content}}</p>
+                                <footer class="blockquote-footer">via <b>{{children_comment.user.username}}</b>|
+                                    {{children_comment.timestamp|timesince}} ago
+                                </footer>
+                            </blockquote>
+                            {% endfor %}
+                            <!--   reply form -->
+                            <form class="pl-sm-5" action="" method="POST">
+                                {% csrf_token %}
+                                {{comment_form|crispy}}
+                                <input type="hidden" name="parent_id" value="{{comment.id}}">
+                                <input type="submit" class="btn btn-info" value="Reply">
+                            </form>
+                        </div><!--  end reply  -->
+
+                    </blockquote>
+                    <hr>
+                    {% endfor %}
+                </div>
+            </div>
+            <!--            end comments-->
+
+            <hr>
+            <div class="share">
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{request.build_absolute_uri}}">
+                    Share on Facebook
+                </a>|
+                <a href="https://twitter.com/home?status=I'm%20going%20to%20learn%20to%20Code...%20Come%20build%20an%20web%20apsp%20with%20me!%20%23CFE%20and%20@justinmitchel%20{{request.build_absolute_uri}}">
+                    Twitter
+                </a>|
+                <a href="https://www.linkedin.com/shareArticle?mini=true&url={{request.build_absolute_uri}}&title=Be%20first%20%7C%20Join%20Swift%20for%20Entrepreneurs&summary=Swift%20for%20Entrepreneurs%20is%20a%20project-based%20programming%20course%20for%20non-technical%20founders.%20We'll%20learn%20how%20to%20build%20iOS%20apps%20from%20scratch%20using%20Apple's%20new%20programming%20language:%20Swift.%20Be%20first%20and%20learn%20with%20me!&source={{request.build_absolute_uri}}">
+                    Linkedin
+                </a>
+            </div>
+            <!--    FB like share button-->
+            <div class="fb-like" data-href="{{request.build_absolute_uri}}" data-width=""
+                 data-layout="button_count" data-action="like" data-size="small" data-show-faces="true"
+                 data-share="true"></div>
+            <!--    END FB like share button-->
+            <!--    Facebook comment-->
+            <div class="fb-comments" data-href="{{request.build_absolute_uri}}"
+                 data-width="" data-numposts="5"></div>
+            <!--   end Facebook comment-->
+        </div>
+    </div>
+</div>
+
+{% endblock %}
